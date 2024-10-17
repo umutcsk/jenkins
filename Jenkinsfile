@@ -5,7 +5,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 // Git deposunu çek
-                git 'C:/Users/umutc/helloWorld/react-hello-world/' // Git reposunun yolu
+                git 'https://github.com/umutcsk/jenkins.git' // Git reposunun yolu
             }
         }
         
