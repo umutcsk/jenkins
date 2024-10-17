@@ -1,42 +1,48 @@
 pipeline {
-    agent any
+    agent any 
 
     stages {
-        stage('Clone Repository') {
+        stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/umutcsk/jenkins.git' 
+                // Git deposunu çek
+                git 'C:/Users/umutc/helloWorld/react-hello-world/' // Git reposunun yolu
             }
         }
-
+        
         stage('Build Docker Image') {
             steps {
+                // Docker imajını oluştur
                 script {
-                    docker.build("react-jenks:latest") 
+                    def imageName = 'my-react-app' // İmaj adı
+                    def tag = 'latest' // İmaj etiketi
+
+                    // Docker imajını oluştur
+                    sh "docker build -t ${imageName}:${tag} ."
                 }
             }
         }
-
-        stage('Run Tests') {
-            steps {
-                echo 'Running tests...'
-            }
-        }
-
-        stage('Deploy') {
+        
+        stage('Run Docker Container') {
             steps {
                 script {
-                    docker.run("react-jenks:latest", '-p 3000:3000')
+                    // Docker konteynerini çalıştır
+                    def containerName = 'my-react-app-container' // Konteyner adı
+
+                    // Önceki bir konteyner varsa durdur ve sil
+                    sh "docker stop ${containerName} || true"
+                    sh "docker rm ${containerName} || true"
+
+                    // Yeni konteyneri başlat
+                    sh "docker run -d --name ${containerName} -p 3000:3000 my-react-app:latest"
                 }
             }
         }
     }
 
     post {
-        success {
-            echo 'Pipeline başarıyla tamamlandı!'
-        }
-        failure {
-            echo 'Pipeline başarısız oldu!'
+        always {
+            // Jenkins konsolunda işlemler hakkında bilgi ver
+            echo 'Docker imajı oluşturuldu ve konteyner çalıştırıldı.'
         }
     }
 }
